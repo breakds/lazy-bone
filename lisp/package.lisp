@@ -12,7 +12,9 @@
            model
            model-name
            def-model
-           compile-model))
+           compile-model
+           def-view
+           compile-view))
 
 ;; (defpackage #:breakds.lazy-bone-example
 ;;   (:nicknames #:lazy-bone-example)

@@ -19,6 +19,8 @@
 
 (defparameter *models* (make-hash-table))
 
+(defparameter *views* (make-hash-table))
+
 
 ;;; +-------------------- strcutures --------------------+
 
@@ -31,12 +33,69 @@
 ;;; constructor 
 ;;;    +
 ;;;    | defaults: plist of (name, initial value)
-;;;    | methods: plist of (name, paren-functions)
+;;;    | methods: plist of (name, paren-function)
 
 
-(defstruct model (name "") (members nil) (defaults nil) (init nil))
+(defstruct model name (members nil) (defaults nil) (init nil))
 
+;;; Views
+;;; structure 
+;;;    +
+;;;    | members: hashtable of (name, paren-value) pairs
+;;;    | tagName: string
+;;;    | tempalte: string
+;;;    | events: plist of (name, member-name)
+;;;    | expand: paren-function
+
+(defstruct view name 
+           (members nil) 
+           (tag-name "") 
+           (template "") 
+           (render nil)
+           (events nil)
+           (expand '(lambda (args) args)))
+
+           
+
+
+(defmacro def-view (name &key (tag-name "") (template "") (events nil) (methods nil) (expand nil))
+  (let ((name-var name))
+    `(setf (gethash ',name-var *views*)
+           (make-view :name ',name-var
+                      :members ,methods
+                      :tag-name ,tag-name
+                      :template ,template
+                      :events ,events
+                      :expand ,expand
+                      :render '(lambda () 
+                                ((chain this $el html)
+                                 (chain this template)
+                                 this)
+                                this)))))
+                                
+                                
+                                
+
+(defmacro compile-view (name)
+  (let ((name-var name))
+    `(let ((view-obj (gethash ',name-var *views*)))
+       (ps* (list defvar ,name-var ((chain *backbone *view extend)
+                                    (create 
+                                     tag-name (view-tag-name view-obj)
+                                     template (view-template view-obj)
+                                     expand (view-expand view-obj)
+                                     render (view-render view-obj))))))))
+                                 
+                                 
+                               
+                           
+
+
+
+
+;;; TODO: Handle initialization
 (defmacro def-model (name &key (defaults nil) (methods nil))
+  "Define a model"
   (let ((name-var name))
     `(setf (gethash ',name-var *models*)
            (make-model :name ',name-var
@@ -44,10 +103,13 @@
                        :defaults '(lambda () (create ,@defaults))))))
 
 
+;;; TODO: Handle initialization
 (defmacro compile-model (name)
+  "Compile a model definition"
   (let ((name-var name))
     `(ps* '(defvar ,name-var ((chain *backbone *model extend)
                               (create defaults (model-defaults (gethash ',name-var *model))))))))
+
 
   
   
