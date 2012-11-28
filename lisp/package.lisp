@@ -12,6 +12,15 @@
            #:make-view
            #:view-add-method
            #:*global-namespace*))
+
+(defpackage #:breakds.lazy-bone-example
+  (:nicknames #:lazy-bone-example)
+  (:use #:cl
+        #:hunchentoot
+        #:breakds.lazy-bone)
+  (:export #:boot
+           #:shutdown))
+
            
 
 

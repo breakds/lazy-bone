@@ -15,54 +15,59 @@
 ;; use string as key for handlers
 (defparameter *handlers* (make-hash-table :test #'equal))
 
-;; acceptor for hunchentoot
-(defparameter *acceptor* nil)
-
-
-(defparameter *global-namespace* (make-hash-table))
+(defparameter *glob
+al-namespace* (make-hash-table))
 
 
 
 
 ;;; +-------------------- strcutures --------------------+
 
+;;; Models
+;;; structure 
+;;;    +
+;;;    | members: hashtable of (name, paren-value) pairs
+;;; constructor 
+;;;    +
+;;;    | defaults: plist of (name, initial value)
+;;;    | methods: plist of (name, paren-functions)
 
-;; widgets will temparorily be like
-;; (list :models (list) 
-;;       :events (list)
-;;       :init   (DSL) 
-;;       :finish (DSL))
 
-;; models will temparorily be like
-;; (list :data (json-list) :listener (widget))
 
 ;;; Views
 
-(defun make-view (&key (tag-name nil) (template "") (events nil))
-  "make a skeleton view"
-  (list :tag-name tag-name
-        :template template
-        :events events))
+;; (defun make-view (&key (tag-name nil) (template "") (events nil))
+;;   "make a skeleton view"
+;;   (let ((new-view (list :tag-name tag-name
+;;                         :template template
+;;                         :events events
+;;                         :expand '(lambda (args) args))))
+;;     (mapcar (lambda (event)
+;;               (setf (getf new-view (cdr event)) 
+;;                     '(lambda (e) e)))
+;;             events)
+;;     new-view))
+        
 
-(defmacro view-add-property (view name js-thunk)
-  "add a method to the view"
-  ;; TODO: check whether body is a lambda
-  (with-gensyms (view-var)
-    `(let ((,view-var (gethash ,view *global-namespace*)))
-       (when ,view-var
-         (setf (getf ,view-var ,name) ,js-thunk)))))
+
+;; (defmacro view-add-property (view name js-thunk)
+;;   "add a method to the view"
+;;   ;; TODO: check whether body is a lambda
+;;   (with-gensyms (view-var)
+;;     `(let ((,view-var (gethash ,view *global-namespace*)))
+;;        (when ,view-var
+;;          (setf (getf ,view-var ,name) ,js-thunk)))))
          
-  
-  
 
-(defmacro def-view (name &key (tag-name nil) (template "") (events nil))
-  "define a view"
-  (with-gensyms (view-name new-view)
-    `(let ((,view-name ,name)
-           (,new-view (make-view :tag-name ,tag-name
-                                 :template ,template
-                                 :events ,events)))
-       (setf (gethash ,view-name *global-namespace*) ,new-view))))
+;; (defmacro def-view (name &key (tag-name nil) (template "") (events nil))
+;;   "define a view"
+;;   (with-gensyms (view-name new-view events-var)
+;;     `(let* ((,view-name ,name)
+;;             (,events-var ,events)
+;;             (,new-view (make-view :tag-name ,tag-name
+;;                                   :template ,template
+;;                                   :events ,events-var)))
+;;        (setf (gethash ,view-name *global-namespace*) ,new-view))))
                        
 
        
