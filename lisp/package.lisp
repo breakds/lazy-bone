@@ -6,20 +6,21 @@
   (:use #:cl
 	#:hunchentoot
         #:breakds.basicl.exmac)
-  (:import-from #:parenscript #:ps* #:ps)
-  (:export #:*acceptor*
-           #:def-view
-           #:make-view
-           #:view-add-method
-           #:*global-namespace*))
+  (:import-from #:parenscript #:ps* #:ps #:create
+                #:chain)
+  (:export *models*
+           model
+           model-name
+           def-model
+           compile-model))
 
-(defpackage #:breakds.lazy-bone-example
-  (:nicknames #:lazy-bone-example)
-  (:use #:cl
-        #:hunchentoot
-        #:breakds.lazy-bone)
-  (:export #:boot
-           #:shutdown))
+;; (defpackage #:breakds.lazy-bone-example
+;;   (:nicknames #:lazy-bone-example)
+;;   (:use #:cl
+;;         #:hunchentoot
+;;         #:breakds.lazy-bone)
+;;   (:export #:boot
+;;            #:shutdown))
 
            
 

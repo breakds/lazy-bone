@@ -8,6 +8,6 @@
 		 #:html-template
 		 #:parenscript)
     :components ((:file "lisp/package")
-		 (:file "lisp/core")
-                 (:file "lisp/example")))
+		 (:file "lisp/core")))
+
     

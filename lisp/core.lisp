@@ -10,15 +10,14 @@
 
 
 
-;;; +------------------- Global Variables -------------------+
+;; +------------------- Global Variables -------------------+
 
 ;; use string as key for handlers
 (defparameter *handlers* (make-hash-table :test #'equal))
 
-(defparameter *glob
-al-namespace* (make-hash-table))
+(defparameter *global-namespace* (make-hash-table))
 
-
+(defparameter *models* (make-hash-table))
 
 
 ;;; +-------------------- strcutures --------------------+
@@ -27,10 +26,32 @@ al-namespace* (make-hash-table))
 ;;; structure 
 ;;;    +
 ;;;    | members: hashtable of (name, paren-value) pairs
+;;;    | defaults: paren-function
+;;;    | init: paren-function
 ;;; constructor 
 ;;;    +
 ;;;    | defaults: plist of (name, initial value)
 ;;;    | methods: plist of (name, paren-functions)
+
+
+(defstruct model (name "") (members nil) (defaults nil) (init nil))
+
+(defmacro def-model (name &key (defaults nil) (methods nil))
+  (let ((name-var name))
+    `(setf (gethash ',name-var *models*)
+           (make-model :name ',name-var
+                       :members ,methods
+                       :defaults '(lambda () (create ,@defaults))))))
+
+
+(defmacro compile-model (name)
+  (let ((name-var name))
+    `(ps* '(defvar ,name-var ((chain *backbone *model extend)
+                              (create defaults (model-defaults (gethash ',name-var *model))))))))
+
+  
+  
+
 
 
 
