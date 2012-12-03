@@ -14,6 +14,9 @@
            bone-name
            bone-base
            bone-members
+           def-model
+           def-view
+           compile-obj
            compile-bone))
 
 ;; (defpackage #:breakds.lazy-bone-example
