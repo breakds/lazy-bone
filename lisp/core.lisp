@@ -25,6 +25,9 @@
   (members nil))
 
 
+(defmethod add-member ((obj bone) member-name member-value)
+  (setf (getf obj member-name) member-value))
+
 
 (defmacro compile-bone (obj)
   (with-gensyms (obj-var)
@@ -53,7 +56,8 @@
                                      (list 'expand (list 'ps:lambda '(args) 'ps:nil))
                                      (list 'render (list 'ps:lambda '()
                                                          '((ps:chain ps:this $el html)
-                                                           ((ps:chain ps:this template) ps:this))))
+                                                           ((ps:chain ps:this template) ps:this))
+                                                         'ps:this))
                                      ,methods))))
 
 (defmacro compile-obj (name)
@@ -66,12 +70,18 @@
 
 ;;; +---------- Backbone Extensions for Parenscript ----------+
 
-(defmacro with-view (base (&rest members) &key (instance-name nil))
-    (let ((class-name (if instance-name
-                        instance-name
-                        (ps:gen-js-name))))
-      (make-bone :name class-name
-                 :base base)
+(defmacro with-view (base (&rest members) &key (instance nil))
+  (with-gensyms (class-name instance-name)
+    `(let ((,class-name (ps:gen-js-name))
+           (,instance-name (aif ,instances it (ps:gen-js-name))))
+       `(setf (gethash ,class-name *namespace*)
+              (make-bone :name ,class-name
+                         :base ,base))
+       (let ((parent (gethash ,class-name *namespace*)))
+         
+       (list 'ps:defvar ,instance-name (list 'ps:new ,classname)))))
+
+
 
 
 

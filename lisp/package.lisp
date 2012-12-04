@@ -8,17 +8,18 @@
         #:breakds.basicl.exmac)
   (:import-from #:parenscript #:ps* #:ps #:create
                 #:chain)
-  (:export *namespace*
-           bone
-           make-bone
-           bone-name
-           bone-base
-           bone-members
-           def-model
-           def-view
-           compile-obj
-           compile-bone
-           with-view))
+  (:export #:*namespace*
+           #:bone
+           #:add-member
+           #:make-bone
+           #:bone-name
+           #:bone-base
+           #:bone-members
+           #:def-model
+           #:def-view
+           #:compile-obj
+           #:compile-bone
+           #:with-view))
 
 ;; (defpackage #:breakds.lazy-bone-example
 ;;   (:nicknames #:lazy-bone-example)
