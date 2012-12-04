@@ -17,7 +17,8 @@
            def-model
            def-view
            compile-obj
-           compile-bone))
+           compile-bone
+           with-view))
 
 ;; (defpackage #:breakds.lazy-bone-example
 ;;   (:nicknames #:lazy-bone-example)

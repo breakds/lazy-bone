@@ -5,6 +5,10 @@
 
 (in-package #:breakds.lazy-bone)
 
+;; + ---------- Global Variables ---------- +
+
+(defparameter *namespace* (make-hash-table))
+
 
 ;;; +---------- Data Structures ----------+
 
@@ -19,6 +23,7 @@
   (name 'noname)
   (base '*object)
   (members nil))
+
 
 
 (defmacro compile-bone (obj)
@@ -50,8 +55,6 @@
                                                          '((ps:chain ps:this $el html)
                                                            ((ps:chain ps:this template) ps:this))))
                                      ,methods))))
-                                                         
-
 
 (defmacro compile-obj (name)
   (with-gensyms (obj)
@@ -61,11 +64,21 @@
 
 
 
+;;; +---------- Backbone Extensions for Parenscript ----------+
+
+(defmacro with-view (base (&rest members) &key (instance-name nil))
+    (let ((class-name (if instance-name
+                        instance-name
+                        (ps:gen-js-name))))
+      (make-bone :name class-name
+                 :base base)
 
 
-;; + ---------- Global Variables ---------- +
 
-(defparameter *namespace* (make-hash-table))
+
+
+
+
 
 
 
