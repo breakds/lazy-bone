@@ -6,21 +6,27 @@ $( function () {
         
         _viewList : {},
 
-        initialize : function( args ) {
+        initialize : function( args, expand ) {
             
             this.collection = args.collection;
-            
+
+
+
             _.bindAll( this, "lazyAdd" );
             this.collection.on( "add", this.lazyAdd );
             _.bindAll( this, "lazyRemove" );
             this.collection.on( "remove", this.lazyRemove );
             _.bindAll( this, "lazyReset" );
             this.collection.on( "reset", this.lazyReset );
-            _.bindAll( this, "expand" );
+            _.bindAll( this, "lazyKill" );
             
             this._viewList = new Array;
+
+            this.collection.each( this.lazyAdd );
             
-            this.expand( args );
+            if ( undefined != expand ) {
+                expand.call( this, args );
+            }
             
         },
         
@@ -44,9 +50,17 @@ $( function () {
 
         lazyRender : function( view ) {},
         
-        expand : function( args ) {}
-
+        lazyKill : function( event ) {
+            for ( view in this._viewList ) {
+                this._viewList[view].remove();
+                delete this._viewList[view];
+            }
+            this.trigger( "killed", event );
+        }
     } );
+
+    // Backbone.LazyView = Backbone.View.extend( {
+    
 
     /* ========== Definition Stage ========== */
     
@@ -59,11 +73,12 @@ $( function () {
             "click" : "onClick"
         },
 
-        initialize: function( args ) {
+        initialize: function( args, expand ) {
             _.bindAll( this, "render" );
-            _.bindAll( this, "expand" );
             this.caption = args.caption;
-            this.expand( args );
+            if ( undefined != expand ) {
+                expand.call( this, args );
+            }
         },
 
         render: function() {
@@ -71,9 +86,7 @@ $( function () {
             return this;
         },
         
-        onClick: function() {},
-        
-        expand: function( args ) {}
+        onClick: function() {}
         
     } );
     
@@ -86,10 +99,13 @@ $( function () {
     } );
 
     var SignalButton = MyButton.extend( {
-        expand : function( args ) {
-            this.model = args.model;
-            this.msg = args.model.msg;
-            this.caption = args.model.caption;
+
+        initialize : function( args, expand ) {
+            this.constructor.__super__.initialize.call( this, args, function( args ) {
+                this.model = args.model;
+                this.msg = args.model.msg;
+                this.caption = args.model.caption;
+            } );
         },
         
         onClick: function() {
@@ -99,16 +115,7 @@ $( function () {
     
 
     var StateSet = Backbone.Collection.extend( {
-        model: ButtonState,
-
-        initialize : function ( args ) {
-            this.on( "clicked", this.decision );
-        }, 
-        
-        decision : function( e ) {
-            this.trigger( "killed", e );
-            this.reset();
-        }
+        model: ButtonState
     } );
     
     var ButtonPanel = Backbone.LazyCollectionView.extend( {
@@ -117,6 +124,15 @@ $( function () {
 
         lazyRender : function( view ) {
             $('#main').append( view.render().el );
+        },
+
+        initialize : function ( args, expand ) {
+            this.constructor.__super__.initialize.call( this, args, function( args ) {
+                this.collection.on( "clicked", function( e ) {
+                    this.collection.reset();
+                    this.lazyKill( e );
+                }, this );
+            } );
         }
     } );
 
@@ -124,17 +140,14 @@ $( function () {
     
     var GenButton = MyButton.extend( {
         onClick: function() {
-            
+
             var state_yes = new ButtonState( { msg : "yes", caption : "Yes" } );
             var state_no = new ButtonState( { msg : "no", caption : "No" } );
-            var set = new StateSet;
             
-            var panel = new ButtonPanel( { collection : set } );
-            set.add( state_yes );
-            set.add( state_no );
+            var panel = new ButtonPanel( { collection : new StateSet( [state_yes, state_no] ) } );
             
             this.undelegateEvents();
-            set.on( "killed", function( e ) {
+            panel.on( "killed", function( e ) {
                 // continuation starts here
                 console.log( "the user clicked " + e );
                 // continuation ends here
