@@ -80,6 +80,7 @@
        (let ((parent (gethash ,class-name *namespace*)))
          
        (list 'ps:defvar ,instance-name (list 'ps:new ,classname)))))
+  
 
 
 
