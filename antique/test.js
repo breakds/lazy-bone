@@ -73,13 +73,12 @@ $( function () {
             "click" : "onClick"
         },
 
-        initialize: function( args, expand ) {
-            _.bindAll( this, "render" );
-            this.caption = args.caption;
+        initialize: ( function( args, expand ) {
+	    this.caption = args.caption;
             if ( undefined != expand ) {
                 expand.call( this, args );
             }
-        },
+        } ),
 
         render: function() {
             this.$el.html( _.template( this.template, { caption: this.caption } ) );

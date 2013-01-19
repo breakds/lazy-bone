@@ -1,97 +1,90 @@
 ;;;; core.lisp
-;;;; Description: core functions/macros for lazy-bone framework
-;;;; Author: BreakDS
-;;;; Date: Sun Dec  2 13:53:42 CST 2012
+;;;; Description:
+
 
 (in-package #:breakds.lazy-bone)
 
-;; + ---------- Global Variables ---------- +
+(defparameter *global* (make-hash-table))
 
-(defparameter *namespace* (make-hash-table))
-
-
-;;; +---------- Data Structures ----------+
-
-;; Bone: A backbone class instance represent a backbone.js class that can be
-;; compiled to javascript declaration and defintion
-;; +----------
-;; | name: symbol representing the identity of the class
-;; | base: symbol representing the idenetty of the base class
-;; | members: plist of (symbol, paren-script) pair
-
-(defstruct bone
-  (name 'noname)
-  (base '*object)
-  (members nil))
+(defclass bone ()
+    ((name :accessor bone-name
+	   :initarg :name
+	   :initform 'no-name
+	   :type symbol)
+     (base :accessor bone-base
+	   :initarg :base
+	   :initform '(chain *bacbkbone *model)
+	   :type (or symbol list))
+     (members :accessor bone-members
+	      :initarg :members
+	      :initform nil
+	      :type list)))
 
 
-(defmethod add-member ((obj bone) member-name member-value)
-  (setf (getf obj member-name) member-value))
+;;; ========== Aux Functions ==========
+(defmacro gen-init-fun (&key (body '(progn)) (call-parent nil))
+  (with-gensyms (body-var call-parent-var)
+    `(let ((,body-var ,body)
+	   (,call-parent-var ,call-parent))
+       (list 'lambda '(args expand)
+	     (if ,call-parent-var
+		 (list 'funcall 
+		       '(chain this constructor __super__ initialize call)
+		       'this 'args (list 'lambda '(args)
+					 ,body-var
+					 nil))
+		 ,body-var)
+	     '(when (ps:!= undefined expand) 
+	       (funcall (chain expand call) this args))
+	     nil))))
+
+;;; ========== Definition Macros ==========
+(defmacro def-view (name (&rest members) 
+		    &key (base '(list 'chain '*backbone '*view)))
+  `(setf (gethash ',name *global*)
+	 (make-instance 'bone
+			:name ',name
+			:base ,base
+			:members (list ,@members))))
+
+(defmacro def-model (name (&rest members) 
+		     &key (base '(list 'chain '*backbone '*model)))
+  `(setf (gethash ',name *global*)
+	 (make-instance 'bone
+			:name ',name
+			:base ,base
+			:members (list ,@members))))
+
+(defmacro def-collection (name (&rest members) 
+			  &key (base '(list 'chain 
+				       '*backbone '*collection)))
+  `(setf (gethash ',name *global*)
+	 (make-instance 'bone
+			:name ',name
+			:base ,base
+			:members (list ,@members))))
+
+(defmacro def-collection-view (name (&rest members) 
+			  &key (base '(list 'chain 
+				       '*backbone '*lazy-collection-view)))
+  `(setf (gethash ',name *global*)
+	 (make-instance 'bone
+			:name ',name
+			:base ,base
+			:members (list ,@members))))
 
 
-(defmacro compile-bone (obj)
-  (with-gensyms (obj-var)
-    `(let ((,obj-var ,obj))
-       (ps:ps* (list 'ps:defvar (bone-name ,obj-var)
-                     (list (list 'ps:chain (bone-base ,obj-var) 'extend)
-                           (cons 'ps:create (bone-members ,obj-var))))))))
-
-
-(defmacro def-model (name &key (defaults nil) (methods nil))
-  `(setf (gethash ',name *namespace* )
-         (make-bone :name ',name
-                    :base '(ps:chain *backbone *model)
-                    :members (append (list 'defaults (list 'ps:lambda '() 
-                                                           (cons 'ps:create ,defaults)))
-                                     ,methods))))
-                                     
-
-(defmacro def-view (name &key (tag-name "") (template "") (events nil) (methods nil))
-  `(setf (gethash ',name *namespace* )
-         (make-bone :name ',name
-                    :base '(ps:chain *backbone *view)
-                    :members (append (list 'tag-name ,tag-name)
-                                     (list 'template ,template)
-                                     (list 'events (cons 'ps:create ,events))
-                                     (list 'expand (list 'ps:lambda '(args) 'ps:nil))
-                                     (list 'render (list 'ps:lambda '()
-                                                         '((ps:chain ps:this $el html)
-                                                           ((ps:chain ps:this template) ps:this))
-                                                         'ps:this))
-                                     ,methods))))
-
-(defmacro compile-obj (name)
-  (with-gensyms (obj)
-    `(let ((,obj (gethash ',name *namespace* )))
-       (when ,obj
-         (compile-bone ,obj)))))
+;;; ========== 1st level Compilers ==========
+(defpsmacro place-view (name)
+  `(setf ,name (lambda () nil)))
 
 
 
-;;; +---------- Backbone Extensions for Parenscript ----------+
 
-(defmacro with-view (base (&rest members) &key (instance nil))
-  (with-gensyms (class-name instance-name)
-    `(let ((,class-name (ps:gen-js-name))
-           (,instance-name (aif ,instances it (ps:gen-js-name))))
-       `(setf (gethash ,class-name *namespace*)
-              (make-bone :name ,class-name
-                         :base ,base))
-       (let ((parent (gethash ,class-name *namespace*)))
-         
-       (list 'ps:defvar ,instance-name (list 'ps:new ,classname)))))
+
+
+
+		       
   
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
