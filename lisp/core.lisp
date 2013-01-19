@@ -75,6 +75,19 @@
 
 
 ;;; ========== 1st level Compilers ==========
+
+(defpsmacro wait-for (identifier expression (&body body) &key (event "killed"))
+  `(progn (defvar ,identifier ,expression)
+          (funcall (chain this undelegate-events))
+          (funcall (chain ,identifier on)
+                   ,event 
+                   (lambda (return-form)
+                     (progn ,@body)
+                     (funcall (chain this delegate-events))
+                     nil)
+                   this)))
+          
+
 (defpsmacro place-view (name)
   `(setf ,name (lambda () nil)))
 

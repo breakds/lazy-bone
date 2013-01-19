@@ -1,6 +1,6 @@
 
 
-
+;; definition of my button
 (lazy-bone:def-view *my-button 
     ('tag-name "button" 
      'template "<%= caption %"
@@ -10,6 +10,11 @@
 			  (ps:chain args caption)))
      'render '(lambda () this)
      'onClick '(lambda () nil)))
+
+
+
+
+;; 
   
 
 			  

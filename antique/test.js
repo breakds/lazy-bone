@@ -59,8 +59,7 @@ $( function () {
         }
     } );
 
-    // Backbone.LazyView = Backbone.View.extend( {
-    
+
 
     /* ========== Definition Stage ========== */
     
@@ -105,6 +104,9 @@ $( function () {
                 this.msg = args.model.msg;
                 this.caption = args.model.caption;
             } );
+	    if ( undefined != expand ) {
+                expand.call( this, args );
+            }
         },
         
         onClick: function() {
@@ -131,13 +133,25 @@ $( function () {
                     this.collection.reset();
                     this.lazyKill( e );
                 }, this );
+		
             } );
+	    if ( undefined != expand ) {
+                expand.call( this, args );
+            }
         }
     } );
 
     /* ========== Compile Stage ========== */
     
     var GenButton = MyButton.extend( {
+	initialize : function( args, expand ) {
+	    this.constructor.__super__.initialize.call( this, args, function( args ) {
+		$('#main').append( this.render().el );
+            } );
+	    if ( undefined != expand ) {
+                expand.call( this, args );
+            }
+	},
         onClick: function() {
 
             var state_yes = new ButtonState( { msg : "yes", caption : "Yes" } );
@@ -156,7 +170,7 @@ $( function () {
     } );
 
     var btn0 = new GenButton( { caption: "Generate" } );
-    $('#main').append( btn0.render().el );
+    
     
 } );
 

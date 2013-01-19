@@ -18,7 +18,8 @@
 	   #:def-model
 	   #:def-collection
 	   #:def-collection-view
-	   #:place-view))
+	   #:place-view
+           #:wait-for))
 
 
 ;; (defpackage #:breakds.lazy-bone-example
