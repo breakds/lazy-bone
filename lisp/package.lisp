@@ -7,19 +7,22 @@
 	#:hunchentoot
         #:breakds.basicl.exmac)
   (:import-from #:parenscript #:ps* #:ps #:create
-                #:chain #:defpsmacro)
+                #:chain #:defpsmacro #:new #:getprop #:@ #:for-in)
   (:export #:*global*
            #:bone
 	   #:bone-name
 	   #:bone-base
 	   #:bone-members
-	   #:gen-init-fun
 	   #:def-view
 	   #:def-model
 	   #:def-collection
 	   #:def-collection-view
 	   #:place-view
-           #:wait-for))
+	   #:bone-definition
+	   #:lazy-init
+           #:wait-for
+	   #:*lazy-view
+	   #:*lazy-collection-view))
 
 
 ;; (defpackage #:breakds.lazy-bone-example

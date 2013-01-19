@@ -1,12 +1,12 @@
 $( function () {
     /* ========== Lazy Plugins ========== */
     
-    Backbone.LazyCollectionView = Backbone.View.extend( {
+    LazyCollectionView = Backbone.View.extend( {
         collectionView : {},
         
         _viewList : {},
 
-        initialize : function( args, expand ) {
+        initialize : function( args, expand, self ) {
             
             this.collection = args.collection;
 
@@ -20,7 +20,7 @@ $( function () {
             this.collection.on( "reset", this.lazyReset );
             _.bindAll( this, "lazyKill" );
             
-            this._viewList = new Array;
+            this._viewList = new Array();
 
             this.collection.each( this.lazyAdd );
             
@@ -51,7 +51,7 @@ $( function () {
         lazyRender : function( view ) {},
         
         lazyKill : function( event ) {
-            for ( view in this._viewList ) {
+            for ( var view in this._viewList ) {
                 this._viewList[view].remove();
                 delete this._viewList[view];
             }
@@ -59,12 +59,31 @@ $( function () {
         }
     } );
 
+    LazyView = Backbone.View.extend( {
+	
+	initialize : function ( args, expand, self ) {
+            
+	    _.bindAll( this, "lazyKill" );
+	    
+	    if ( undefined != expand ) {
+                expand.call( this, args );
+            }
+	},
+	
+	lazyKill : function ( event ) {
+	    this.trigger( "killed", event );
+	    this.remove();
+	}
+	
+    } );
+
 
 
     /* ========== Definition Stage ========== */
     
-    var MyButton = Backbone.View.extend( {
-        tagName: 'button',
+    MyButton = LazyView.extend( {
+        
+	tagName: 'button',
         
         template: '<%= caption %>',
         
@@ -72,8 +91,25 @@ $( function () {
             "click" : "onClick"
         },
 
-        initialize: ( function( args, expand ) {
-	    this.caption = args.caption;
+        initialize: ( function( args, expand, self ) {
+	    ( function ( cont ) {
+		if ( undefined == self ) {
+		    this.constructor.__super__.initialize.call( 
+			this, 
+			args, 
+			cont,
+			this.constructor.__super__ )
+		} else {
+		    self.constructor.__super__.initialize.call( 
+			this, 
+			args, 
+			cont,
+			self.constructor.__super__ )
+		}
+	    } ).call( this, function( args ) {
+		this.caption = args.caption;
+	    } );
+		    
             if ( undefined != expand ) {
                 expand.call( this, args );
             }
@@ -89,21 +125,36 @@ $( function () {
     } );
     
     
-    var ButtonState = Backbone.Model.extend( {
+    ButtonState = Backbone.Model.extend( {
         initialize : function ( args ) {
             this.caption = args.caption;
             this.msg = args.msg;
         }
     } );
 
-    var SignalButton = MyButton.extend( {
+    SignalButton = MyButton.extend( {
 
-        initialize : function( args, expand ) {
-            this.constructor.__super__.initialize.call( this, args, function( args ) {
-                this.model = args.model;
-                this.msg = args.model.msg;
-                this.caption = args.model.caption;
-            } );
+        initialize : function( args, expand, self ) {
+	    ( function ( cont ) {
+		if ( undefined == self ) {
+		    this.constructor.__super__.initialize.call( 
+			this, 
+			args, 
+			cont,
+			this.constructor.__super__ )
+		} else {
+		    self.constructor.__super__.initialize.call( 
+			this, 
+			args, 
+			cont,
+			self.constructor.__super__ )
+		}
+	    } ).call( this, function( args ) {
+		this.model = args.model;
+		this.msg = args.model.msg;
+		this.caption = args.model.caption;
+	    } );
+	    
 	    if ( undefined != expand ) {
                 expand.call( this, args );
             }
@@ -115,11 +166,11 @@ $( function () {
     } );
     
 
-    var StateSet = Backbone.Collection.extend( {
+    StateSet = Backbone.Collection.extend( {
         model: ButtonState
     } );
     
-    var ButtonPanel = Backbone.LazyCollectionView.extend( {
+    ButtonPanel = LazyCollectionView.extend( {
         
         collectionView : SignalButton,
 
@@ -127,14 +178,28 @@ $( function () {
             $('#main').append( view.render().el );
         },
 
-        initialize : function ( args, expand ) {
-            this.constructor.__super__.initialize.call( this, args, function( args ) {
-                this.collection.on( "clicked", function( e ) {
-                    this.collection.reset();
-                    this.lazyKill( e );
-                }, this );
-		
-            } );
+        initialize : function ( args, expand, self ) {
+	    ( function ( cont ) {
+		if ( undefined == self ) {
+		    this.constructor.__super__.initialize.call( 
+			this, 
+			args, 
+			cont,
+			this.constructor.__super__ )
+		} else {
+		    self.constructor.__super__.initialize.call( 
+			this, 
+			args, 
+			cont,
+			self.constructor.__super__ )
+		}
+	    } ).call( this, function( args ) {
+		this.collection.on( "clicked", function( e ) {
+		    this.collection.reset();
+		    this.lazyKill( e );
+		}, this );
+	    } );
+
 	    if ( undefined != expand ) {
                 expand.call( this, args );
             }
@@ -143,9 +208,9 @@ $( function () {
 
     /* ========== Compile Stage ========== */
     
-    var GenButton = MyButton.extend( {
+    GenButton = MyButton.extend( {
 	initialize : function( args, expand ) {
-	    this.constructor.__super__.initialize.call( this, args, function( args ) {
+	    GenButton.__super__.initialize.call( this, args, function( args ) {
 		$('#main').append( this.render().el );
             } );
 	    if ( undefined != expand ) {
