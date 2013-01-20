@@ -2,14 +2,14 @@
 
 ;; definition of my button
 (lazy-bone:def-view *my-button 
-    ('tag-name "button" 
-     'template "<%= caption %"
-     'events '(ps:create "click" "onClick")
-     'initialize (lazy-bone:gen-init-fun 
-		  :body '(setf (ps:chain this caption) 
-			  (ps:chain args caption)))
-     'render '(lambda () this)
-     'onClick '(lambda () nil)))
+    (('tag-name "button")
+     ('template "<%= caption %")
+     ('events '(ps:create "click" "onClick"))
+     ('initialize '(lazy-bone:lazy-init
+                    '(setf (ps:chain this caption) 
+                      (ps:chain args caption))))
+     ('render '(lambda () this))
+     ('onClick '(lambda () nil))))
 
 
 

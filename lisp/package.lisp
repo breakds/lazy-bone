@@ -17,12 +17,17 @@
 	   #:def-model
 	   #:def-collection
 	   #:def-collection-view
+           #:access-bone
+           #:clear-global
 	   #:place-view
 	   #:bone-definition
 	   #:lazy-init
-           #:wait-for
+           #:wait-until
 	   #:*lazy-view
-	   #:*lazy-collection-view))
+	   #:*lazy-collection-view
+           #:gen-topological
+           #:compile-to-js))
+
 
 
 ;; (defpackage #:breakds.lazy-bone-example

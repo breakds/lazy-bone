@@ -98,13 +98,13 @@ $( function () {
 			this, 
 			args, 
 			cont,
-			this.constructor.__super__ )
+			this.constructor.__super__ );
 		} else {
 		    self.constructor.__super__.initialize.call( 
 			this, 
 			args, 
 			cont,
-			self.constructor.__super__ )
+			self.constructor.__super__ );
 		}
 	    } ).call( this, function( args ) {
 		this.caption = args.caption;
@@ -141,13 +141,13 @@ $( function () {
 			this, 
 			args, 
 			cont,
-			this.constructor.__super__ )
+			this.constructor.__super__ );
 		} else {
 		    self.constructor.__super__.initialize.call( 
 			this, 
 			args, 
 			cont,
-			self.constructor.__super__ )
+			self.constructor.__super__ );
 		}
 	    } ).call( this, function( args ) {
 		this.model = args.model;
@@ -170,6 +170,11 @@ $( function () {
         model: ButtonState
     } );
     
+    
+   
+   
+
+
     ButtonPanel = LazyCollectionView.extend( {
         
         collectionView : SignalButton,
@@ -185,13 +190,13 @@ $( function () {
 			this, 
 			args, 
 			cont,
-			this.constructor.__super__ )
+			this.constructor.__super__ );
 		} else {
 		    self.constructor.__super__.initialize.call( 
 			this, 
 			args, 
 			cont,
-			self.constructor.__super__ )
+			self.constructor.__super__ );
 		}
 	    } ).call( this, function( args ) {
 		this.collection.on( "clicked", function( e ) {
@@ -207,8 +212,8 @@ $( function () {
     } );
 
     /* ========== Compile Stage ========== */
-    
-    GenButton = MyButton.extend( {
+
+      GenButton = MyButton.extend( {
 	initialize : function( args, expand ) {
 	    GenButton.__super__.initialize.call( this, args, function( args ) {
 		$('#main').append( this.render().el );
@@ -233,6 +238,8 @@ $( function () {
             }, this );
         }
     } );
+    
+    
 
     var btn0 = new GenButton( { caption: "Generate" } );
     
