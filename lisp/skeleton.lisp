@@ -15,7 +15,7 @@
      ('lazy-kill '(lambda (event) 
 		   (funcall (chain this trigger) "killed" event)
 		   (funcall (chain this remove)))))
-  :base '(chain *backbone *view))
+  :base (chain *backbone *view))
 
 
 ;;; base class for collection-view
@@ -62,4 +62,4 @@
 		    (delete (getprop (@ this _view-list) view)))
 		   (funcall (@ this trigger) "killed" event)
 		   nil)))
-  :base '(chain *backbone *view))
+  :base (chain *backbone *view))

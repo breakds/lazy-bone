@@ -26,18 +26,10 @@
 	   #:*lazy-view
 	   #:*lazy-collection-view
            #:gen-topological
-           #:compile-to-js))
-
-
-
-;; (defpackage #:breakds.lazy-bone-example
-;;   (:nicknames #:lazy-bone-example)
-;;   (:use #:cl
-;;         #:hunchentoot
-;;         #:breakds.lazy-bone)
-;;   (:export #:boot
-;;            #:shutdown))
-
+           #:compile-to-js
+           #:define-simple-app
+           #:start-server
+           #:stop-server))
            
 
 

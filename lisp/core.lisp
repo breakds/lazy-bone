@@ -6,6 +6,7 @@
 
 (defparameter *global* (make-hash-table :test #'equal))
 
+
 (defclass bone ()
     ((name :accessor bone-name
 	   :initarg :name
@@ -25,14 +26,14 @@
 (defmacro def-view (name (&rest members) 
 		    &key (base '*lazy-view))
   `(setf (gethash ',name *global*)
-	 (make-instance 'bone
-			:name ',name
-			:base ',base
-			:members (list ,@(loop for pair in members
+         (make-instance 'bone
+                        :name ',name
+                        :base ',base
+                        :members (list ,@(loop for pair in members
 					    append pair)))))
 
 (defmacro def-model (name (&rest members) 
-		     &key (base '(list 'chain '*backbone '*model)))
+		     &key (base '(chain *backbone *model)))
   `(setf (gethash ',name *global*)
 	 (make-instance 'bone
 			:name ',name
@@ -42,8 +43,8 @@
 
 
 (defmacro def-collection (name (&rest members) 
-			  &key (base '(list 'chain 
-				       '*backbone '*collection)))
+			  &key (base '(chain 
+				       *backbone *collection)))
   `(setf (gethash ',name *global*)
 	 (make-instance 'bone
 			:name ',name
@@ -86,7 +87,7 @@
 
 (defpsmacro lazy-init (&body body)
   `(lambda (args expand self)
-     (funcall (lambda (cont)
+     ((@ (lambda (cont)
 		(if (ps::== undefined self)
 		    (funcall 
 		     (chain this constructor __super__ initialize call)
@@ -96,16 +97,16 @@
 		     (chain self constructor __super__ initialize call)
 		     this args cont
 		     (chain self constructor __super__)))
-		nil)
-	      this (lambda (args)
-		     (progn ,@body)
-		     nil))
+		nil) call)
+      this (lambda (args)
+             (progn ,@body)
+             nil))
      (when (ps:!= undefined expand)
        (funcall (chain expand call) this args))
      nil))
 
 (defpsmacro lazy-init-base (&body body)
-  `(lambda (args expand)
+  `(lambda (args expand self)
      (progn ,@body)
      (when (ps:!= undefined expand)
        (funcall (chain expand call) this args))
@@ -130,11 +131,52 @@
                          ,@body
                          nil)))))
 
+;; ========== Hunchentoot ==========
+(defparameter *acceptor* nil)
 
 
+(defmacro define-simple-app (app-name (&key (title "Simple Application") 
+                                            (uri "/app") 
+                                            (port 8080)
+                                            (document-base "")) &body body)
+  
+  `(progn
+     (hunchentoot:define-easy-handler (,app-name :uri ,uri) ()
+       (setf (hunchentoot:content-type*) "text/html")
+       (let ((html-template:*string-modifier* #'identity))
+         (with-output-to-string (html-template:*default-template-output*)
+           (html-template:fill-and-print-template 
+            (merge-pathnames "template/simple-template.tmpl" (asdf:system-source-directory 'lazy-bone))
+            (list :title ,title
+                  :javascript (compile-to-js ,@body))))))
+     (setf *acceptor* (make-instance 'hunchentoot:easy-acceptor 
+                                     :port ,port
+                                     :document-root ,document-base))))
+
+(defun start-server ()
+  (when *acceptor*
+    (hunchentoot:start *acceptor*)
+    (format t "server started.~%")))
+
+
+(defun stop-server ()
+  (when *acceptor*
+    (hunchentoot:stop *acceptor*)
+    (format t "server stopped.~%")))
+
+
+                                     
+
+
+  
+        
+          
+        
+        
+     
         
 
-      
+
 
 
 

@@ -214,10 +214,25 @@ $( function () {
     /* ========== Compile Stage ========== */
 
       GenButton = MyButton.extend( {
-	initialize : function( args, expand ) {
-	    GenButton.__super__.initialize.call( this, args, function( args ) {
+	initialize : function( args, expand, self ) {
+	     ( function ( cont ) {
+		if ( undefined == self ) {
+		    this.constructor.__super__.initialize.call( 
+			this, 
+			args, 
+			cont,
+			this.constructor.__super__ );
+		} else {
+		    self.constructor.__super__.initialize.call( 
+			this, 
+			args, 
+			cont,
+			self.constructor.__super__ );
+		}
+	    } ).call( this, function( args ) {
 		$('#main').append( this.render().el );
-            } );
+	    } );
+	    
 	    if ( undefined != expand ) {
                 expand.call( this, args );
             }
