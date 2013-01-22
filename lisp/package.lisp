@@ -23,6 +23,7 @@
 	   #:bone-definition
 	   #:lazy-init
            #:wait-until
+	   #:acquire-args
 	   #:*lazy-view
 	   #:*lazy-collection-view
            #:gen-topological

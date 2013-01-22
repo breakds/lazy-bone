@@ -23,6 +23,7 @@
 
 
 ;;; ========== Definition Macros ==========
+
 (defmacro def-view (name (&rest members) 
 		    &key (base '*lazy-view))
   `(setf (gethash ',name *global*)
@@ -88,7 +89,7 @@
 (defpsmacro lazy-init (&body body)
   `(lambda (args expand self)
      ((@ (lambda (cont)
-		(if (ps::== undefined self)
+		(if (equal undefined self)
 		    (funcall 
 		     (chain this constructor __super__ initialize call)
 		     this args cont 
@@ -121,6 +122,17 @@
 
 (defpsmacro place-view (name)
   `(setf ,name (lambda () nil)))
+
+
+;;; ========== temperary parenscript macros ==========
+(defpsmacro acquire-args ((&rest names) (&rest arg-names))
+  `(setf ,@(mapcan (lambda (x y) (list (list 'chain 'this x) 
+				       (list 'chain 'args y)))
+		   names arg-names)))
+  
+
+  
+
 
 (defmacro compile-to-js (&body body)
   (with-gensyms (name)
