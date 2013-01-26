@@ -2,24 +2,29 @@ $( function () {
     /* ========== Lazy Plugins ========== */
     
     LazyCollectionView = Backbone.View.extend( {
-        collectionView : {},
         
-        _viewList : {},
+        bindTo : function( dispatcher, event, callback ) {
+            this.bindings.push( { dispatcher : dispatcher, 
+                                  event : event,
+                                  callback : callback } );
+            dispatcher.on( event, callback, this );
+        },
+
 
         initialize : function( args, expand, self ) {
             
             this.collection = args.collection;
 
-
+            this.bindings = new Array();
 
             _.bindAll( this, "lazyAdd" );
-            this.collection.on( "add", this.lazyAdd );
             _.bindAll( this, "lazyRemove" );
-            this.collection.on( "remove", this.lazyRemove );
             _.bindAll( this, "lazyReset" );
-            this.collection.on( "reset", this.lazyReset );
-            _.bindAll( this, "lazyKill" );
-            
+
+            this.bindTo( this.collection, "add", this.lazyAdd );
+            this.bindTo( this.collection, "remove", this.lazyRemove );
+            this.bindTo( this.collection, "reset", this.lazyReset );
+
             this._viewList = new Array();
 
             this.collection.each( this.lazyAdd );
@@ -37,43 +42,59 @@ $( function () {
         },
 
         lazyRemove : function( model ) {
-            this._viewList[model.cid].remove();
+            this._viewList[model.cid].terminate();
             delete this._viewList[model.cid];
         },
 
         lazyReset : function( e ) {
             for ( view in this._viewList ) {
-                this._viewList[view].remove();
+                this._viewList[view].terminate();
                 delete this._viewList[view];
             }
         },
 
         lazyRender : function( view ) {},
         
-        lazyKill : function( event ) {
+        terminate : function( event ) {
+            this.remove();
+            this.trigger( "terminate", event );
+            this.undelegateEvents();
             for ( var view in this._viewList ) {
-                this._viewList[view].remove();
+                this._viewList[view].terminate();
                 delete this._viewList[view];
             }
-            this.trigger( "killed", event );
         }
     } );
 
     LazyView = Backbone.View.extend( {
 	
 	initialize : function ( args, expand, self ) {
+
+            this.bindings = new Array();
             
-	    _.bindAll( this, "lazyKill" );
+	    // _.bindAll( this, "lazyKill" );
 	    
 	    if ( undefined != expand ) {
                 expand.call( this, args );
             }
 	},
-	
-	lazyKill : function ( event ) {
-	    this.trigger( "killed", event );
-	    this.remove();
-	}
+
+        bindTo : function( dispatcher, event, callback ) {
+            this.bindings.push( { dispatcher : dispatcher, 
+                                  event : event,
+                                  callback : callback } );
+            dispatcher.on( event, callback, this );
+        },
+        
+        terminate : function( event ) {
+            this.remove();
+            this.trigger( "terminate", event );
+            this.undelegateEvents();
+            for ( item in this.bindings ) {
+                this.bindings[item].dispatcher.off( null, null, this );
+            }
+        }
+
 	
     } );
 
@@ -201,7 +222,7 @@ $( function () {
 	    } ).call( this, function( args ) {
 		this.collection.on( "clicked", function( e ) {
 		    this.collection.reset();
-		    this.lazyKill( e );
+		    this.terminate( e );
 		}, this );
 	    } );
 
@@ -245,7 +266,7 @@ $( function () {
             var panel = new ButtonPanel( { collection : new StateSet( [state_yes, state_no] ) } );
             
             this.undelegateEvents();
-            panel.on( "killed", function( e ) {
+            panel.on( "terminate", function( e ) {
                 // continuation starts here
                 console.log( "the user clicked " + e );
                 // continuation ends here
