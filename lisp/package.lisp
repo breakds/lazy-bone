@@ -30,7 +30,9 @@
            #:compile-to-js
            #:define-simple-app
            #:start-server
-           #:stop-server))
+           #:stop-server
+           ;; for debugging
+           #:*acceptor*))
            
 
 

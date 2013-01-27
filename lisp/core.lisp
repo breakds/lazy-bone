@@ -148,21 +148,27 @@
 
 (defmacro define-simple-app (app-name (&key (title "Simple Application") 
                                             (uri "/app") 
+                                            (template nil)
                                             (port 8080)
                                             (document-base "")) &body body)
-  
   `(progn
      (hunchentoot:define-easy-handler (,app-name :uri ,uri) ()
        (setf (hunchentoot:content-type*) "text/html")
        (let ((html-template:*string-modifier* #'identity))
          (with-output-to-string (html-template:*default-template-output*)
            (html-template:fill-and-print-template 
-            (merge-pathnames "template/simple-template.tmpl" (asdf:system-source-directory 'lazy-bone))
+            ,(let ((tmpl template))
+                  (if tmpl
+                      tmpl
+                      (merge-pathnames "template/simple-template.tmpl" (asdf:system-source-directory 'lazy-bone))))
             (list :title ,title
                   :javascript (compile-to-js ,@body))))))
      (setf *acceptor* (make-instance 'hunchentoot:easy-acceptor 
                                      :port ,port
                                      :document-root ,document-base))))
+
+
+
 
 (defun start-server ()
   (when *acceptor*
