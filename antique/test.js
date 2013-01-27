@@ -72,8 +72,6 @@ $( function () {
 
             this.bindings = new Array();
             
-	    // _.bindAll( this, "lazyKill" );
-	    
 	    if ( undefined != expand ) {
                 expand.call( this, args );
             }
@@ -220,10 +218,11 @@ $( function () {
 			self.constructor.__super__ );
 		}
 	    } ).call( this, function( args ) {
-		this.collection.on( "clicked", function( e ) {
+
+                this.bindTo( this.collection, "clicked", function( e ) {
 		    this.collection.reset();
 		    this.terminate( e );
-		}, this );
+		} );
 	    } );
 
 	    if ( undefined != expand ) {
@@ -266,12 +265,12 @@ $( function () {
             var panel = new ButtonPanel( { collection : new StateSet( [state_yes, state_no] ) } );
             
             this.undelegateEvents();
-            panel.on( "terminate", function( e ) {
+            this.bindTo( panel, "terminate", function( e ) {
                 // continuation starts here
                 console.log( "the user clicked " + e );
                 // continuation ends here
                 this.delegateEvents();
-            }, this );
+            } );
         }
     } );
     

@@ -75,16 +75,15 @@
 
 
 ;;; ========== Compiler Macros==========
-(defpsmacro wait-until (identifier expression (&body body) &key (event "killed"))
+(defpsmacro wait-until (identifier expression (&body body) &key (event "terminate"))
   `(progn (defvar ,identifier ,expression)
           (funcall (chain this undelegate-events))
-          (funcall (chain ,identifier on)
-                   ,event 
-                   (lambda (return-form)
-                     (progn ,@body)
-                     (funcall (chain this delegate-events))
-                     nil)
-                   this)))
+          ((@ this bind-to) ,identifier ,event
+           (lambda (return-form)
+             (progn ,@body)
+             (funcall (chain this delegate-events))
+             nil))))
+
 
 (defpsmacro lazy-init (&body body)
   `(lambda (args expand self)

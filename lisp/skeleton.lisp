@@ -11,18 +11,13 @@
 ;;; base class for view
 (def-view *lazy-view
     (('initialize '(lazy-init-base 
-                    (setf (@ this bindings) (new (array)))))
+                    (setf (@ this bindings) (new (*array)))))
      ('bind-to '(lambda (dispatcher event callback)
                  ((@ this bindings push) (create 
-                                          disptacher dispatcher
+                                          dispatcher dispatcher
                                           event event
                                           callback callback))
-                 ((@ dispatcher on) event callbak this)))
-     ('terminate '(lambda (event) 
-                   ((@ this remove))
-
-		   (funcall (chain this trigger) "killed" event)
-		   (funcall (chain this))))
+                 ((@ dispatcher on) event callback this)))
      ('terminate '(lambda (event)
                    ((@ this remove))
                    ((@ this trigger) "terminate" event)
@@ -34,7 +29,7 @@
                    (for-in (item (@ this bindings))
                     ((@ (getprop (@ this bindings) item) dispatcher off)
                      nil
-                     nuil
+                     nil
                      this)))
                  nil))
   :base (chain *backbone *view))
@@ -44,10 +39,10 @@
 (def-view *lazy-collection-view
     (('bind-to '(lambda (dispatcher event callback)
                  ((@ this bindings push) (create 
-                                          disptacher dispatcher
+                                          dispatcher dispatcher
                                           event event
                                           callback callback))
-                 ((@ dispatcher on) event callbak this)))
+                 ((@ dispatcher on) event callback this)))
      ('initialize '(lazy-init-base
                     ;; assign model
 		    (setf (chain this collection) (chain args collection))
@@ -58,6 +53,7 @@
                     ((@ _ bind-all) this "lazyReset")
 
                     ;; bind event handlers
+                    (setf (@ this bindings) (new (*array)))
                     ((@ this bind-to) (@ this collection) "add" (@ this lazy-add))
                     ((@ this bind-to) (@ this collection) "remove" (@ this lazy-remove))
                     ((@ this bind-to) (@ this collection) "reset" (@ this lazy-reset))
@@ -94,7 +90,7 @@
                    (for-in (item (@ this bindings))
                     ((@ (getprop (@ this bindings) item) dispatcher off)
                      nil
-                     nuil
-                     this)))
+                     nil
+                     this))
 		   nil)))
   :base (chain *backbone *view))
