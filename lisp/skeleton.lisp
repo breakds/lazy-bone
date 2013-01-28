@@ -49,7 +49,7 @@
 
                     ;; set handlers scopes
                     ((@ _ bind-all) this "lazyAdd")
-                    ((@ _ bind-all) this "lazyAdd")
+                    ((@ _ bind-all) this "lazyRemove")
                     ((@ _ bind-all) this "lazyReset")
 
                     ;; bind event handlers
