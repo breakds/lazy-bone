@@ -22,6 +22,7 @@
 	   #:place-view
 	   #:bone-definition
 	   #:lazy-init
+	   #:lazy-init-base
            #:wait-until
 	   #:acquire-args
 	   #:*lazy-view
