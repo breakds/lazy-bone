@@ -101,14 +101,14 @@
       this (lambda (args)
              (progn ,@body)
              nil))
-     (when (ps:!= undefined expand)
+     (when (not (equal undefined expand))
        (funcall (chain expand call) this args))
      nil))
 
 (defpsmacro lazy-init-base (&body body)
   `(lambda (args expand self)
      (progn ,@body)
-     (when (ps:!= undefined expand)
+     (when (not (equal undefined expand))
        (funcall (chain expand call) this args))
      nil))
 
@@ -121,6 +121,9 @@
 
 (defpsmacro place-view (name)
   `(setf ,name (lambda () nil)))
+
+(defpsmacro trace (expression)
+  `((@ console log) ,expression))
 
 
 ;;; ========== temperary parenscript macros ==========
@@ -149,6 +152,8 @@
 (defmacro define-simple-app (app-name (&key (title "Simple Application") 
                                             (uri "/app") 
                                             (template nil)
+					    (css nil)
+					    (libs nil)
                                             (port 8080)
                                             (document-base "")) &body body)
   `(progn
@@ -162,6 +167,10 @@
                       tmpl
                       (merge-pathnames "template/simple-template.tmpl" (asdf:system-source-directory 'lazy-bone))))
             (list :title ,title
+		  :css (list ,@(loop for url in css
+				  collect (list 'list :url url)))
+		  :libs (list ,@(loop for url in libs
+				   collect (list 'list :url url)))
                   :javascript (compile-to-js ,@body))))))
      (setf *acceptor* (make-instance 'hunchentoot:easy-acceptor 
                                      :port ,port

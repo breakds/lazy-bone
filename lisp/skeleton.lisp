@@ -10,87 +10,45 @@
 
 ;;; base class for view
 (def-view *lazy-view
-    (('initialize '(lazy-init-base 
-                    (setf (@ this bindings) (new (*array)))))
-     ('bind-to '(lambda (dispatcher event callback)
-                 ((@ this bindings push) (create 
-                                          dispatcher dispatcher
-                                          event event
-                                          callback callback))
-                 ((@ dispatcher on) event callback this)))
-     ('terminate '(lambda (event)
-                   ((@ this remove))
-                   ((@ this trigger) "terminate" event)
-                   ((@ this undelegate-events))
-		   (for-in (view (@ this _view-list))
-		    (funcall (@ (getprop (@ this _view-list) view)
-				terminate))
-		    (delete (getprop (@ this _view-list) view)))
-                   (for-in (item (@ this bindings))
-                    ((@ (getprop (@ this bindings) item) dispatcher off)
-                     nil
-                     nil
-                     this)))
-                 nil))
+    (('initialize '(lazy-init-base
+		    (if (not (equal undefined (@ args parent-node)))
+			(setf (@ this parent-node)
+			      (@ args parent-node))
+			(setf (@ this parent-node)
+			      ($ "body")))
+		    (setf (@ this view-list) (new (*array)))))
+     ('terminate '(lambda (msg)
+		   ((@ this undelegate-events))
+		   ((@ this remove))
+		   (for-in (cid (@ this view-list))
+		    ((@ (getprop (@ this view-list) cid) terminate))
+		    (delete (getprop (@ this view-list) cid)))
+		   nil))
+     ('add-sub-view '(lambda (view)
+		      (setf (getprop (@ this view-list) cid) view))))
   :base (chain *backbone *view))
 
-
-;;; base class for collection-view
 (def-view *lazy-collection-view
-    (('bind-to '(lambda (dispatcher event callback)
-                 ((@ this bindings push) (create 
-                                          dispatcher dispatcher
-                                          event event
-                                          callback callback))
-                 ((@ dispatcher on) event callback this)))
-     ('initialize '(lazy-init-base
-                    ;; assign model
-		    (setf (chain this collection) (chain args collection))
-
-                    ;; set handlers scopes
-                    ((@ _ bind-all) this "lazyAdd")
-                    ((@ _ bind-all) this "lazyRemove")
-                    ((@ _ bind-all) this "lazyReset")
-
-                    ;; bind event handlers
-                    (setf (@ this bindings) (new (*array)))
-                    ((@ this bind-to) (@ this collection) "add" (@ this lazy-add))
-                    ((@ this bind-to) (@ this collection) "remove" (@ this lazy-remove))
-                    ((@ this bind-to) (@ this collection) "reset" (@ this lazy-reset))
-                    
-		    (setf (chain this _view-list) (new *array))
-		    (funcall (chain this collection each)
-		     (chain this lazy-add))))
-     ('lazy-add '(lambda (model) 
-     		  (defvar view (new ((chain this collection-view) 
+    (('initialize '(lazy-init
+		    (setf sub-view (create))
+		    ((@ _ bind-all) this "lazyAdd")
+		    ((@ _ bind-all) this "lazyRemove")
+		    ((@ this listen-to) (@ this model) 
+		     "add" (@ this lazy-add))
+		    ((@ this listen-to) (@ this model) 
+		     "remove" (@ this lazy-remove))
+		    ((@ this model each) (@ this lazy-add))))
+     ('lazy-add '(lambda (model)
+		  (defvar view (new ((@ this sub-view) 
 				     (create model model))))
-		  (setf (getprop (@ this _view-list) (@ model cid)) view)
-		  (funcall (@ this lazy-render) view)
-		  nil))
+		  (setf (getprop (@ this view-list) (@ model cid)) view)
+		  ((@ this register) model)
+		  view))
      ('lazy-remove '(lambda (model) 
-		     ((@ (getprop (@ this _view-list) (@ model cid))
-                       terminate))
-		     (delete (getprop (@ this _view-list) (@ model cid)))
-		     nil))
-     ('lazy-reset '(lambda (event)
-		    (for-in (view (@ this _view-list))
-		     (funcall (@ (getprop (@ this _view-list) view)
-				 terminate))
-		     (delete (getprop (@ this _view-list) view)))
-		    nil))
-     ('lazy-render '(lambda (view) nil))
-     ('terminate '(lambda (event)
-                   ((@ this remove))
-                   ((@ this trigger) "terminate" event)
-                   ((@ this undelegate-events))
-		   (for-in (view (@ this _view-list))
-		    (funcall (@ (getprop (@ this _view-list) view)
-				terminate))
-		    (delete (getprop (@ this _view-list) view)))
-                   (for-in (item (@ this bindings))
-                    ((@ (getprop (@ this bindings) item) dispatcher off)
-                     nil
-                     nil
-                     this))
-		   nil)))
-  :base (chain *backbone *view))
+		     ((@ (getprop (@ this view-list) (@ model cid)) terminate))
+		     (delete (getprop (@ this view-list) (@ model cid)))))
+     ('register '(lambda (model)
+		  ((@ this $el append)
+		   (@ ((@ (getprop (@ this view-list) (@ model cid)) render)) el)))))
+  :base *lazy-view)
+

@@ -24,6 +24,7 @@
 	   #:lazy-init
 	   #:lazy-init-base
            #:wait-until
+	   #:trace
 	   #:acquire-args
 	   #:*lazy-view
 	   #:*lazy-collection-view
