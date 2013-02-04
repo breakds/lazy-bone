@@ -1,7 +1,5 @@
-![alt text](https://raw.github.com/breakds/lazy-bone/master/logo/lazy-bone-small.png "lazy-bone") 
-
 [Common Lisp Web Application Framework for lazy Programmers](https://github.com/breakds/lazy-bone)
-
+![alt text](https://raw.github.com/breakds/lazy-bone/master/logo/lazy-bone-small.png "lazy-bone") 
 ======
 
 ## Introduction
