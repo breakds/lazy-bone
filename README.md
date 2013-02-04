@@ -4,10 +4,15 @@
 
 ## Introduction
 
-Cassandra does not provide an official driver for common lisp, but there is one for python.
-This package provides routines that send CQL queries to a python server via socket, and the python server will
-execute the query with the python driver and send the result back to common lisp.
-
+Thanks to Backbone.js, development of a single-page web application is much simplified. However, the development process is still
+tedious. This framework frees you from the tedious work by allowing you to write some simple lisp code and generating code
+for both client-side and server-side. The features are
+  * Generating javascript code dynamically, built upon Backbone.js for the client
+  * Generating HTML dynamically with [html-template](http://weitz.de/html-template/)
+  * With [parenscript](http://common-lisp.net/project/parenscript/), you can enjoy the power of lisp macros while programming the web application
+  * Provide some continuation-based syntax, which is natural in web application development
+  * Write your code for server and client **simultaneously**
+  * After compiling your application, just run (your-app-name:start-server) to start your web application
 
 
 ## Author
@@ -18,41 +23,10 @@ execute the query with the python driver and send the result back to common lisp
 + https://github.com/breakds
 
 
-## Usage
+## Example
 
-### Step 1
+An example is built on top of this library can be found [here](https://github.com/breakds/lazy-bone-example)
 
-Start the python server by calling the cqlServer.py
-
-```bash
-path-to-this-project/python/cqlServer.py
-```
-
-### Step 2
-
-Load the asdf system via quicklisp. (Put the project folder under quicklisp-folder/local-projects or create a soft link 
-under that folder before loading the system)
-
-```lisp
-(ql:quickload 'clq-socket)
-```
-
-
-### Step 3
-
-Connect to a cassandra keyspace
-
-```lisp
-(cql-socket:cql-use-keyspace "keyspace-name" :host "localhost" :port 9160)
-```
-
-### Step 4
-
-You can start to send queries now by
-
-```lisp
-(cql-socket:cql-query "select * from data-base-name")
-```
 
 ## Lisence
 
