@@ -42,6 +42,16 @@
 			:members (list ,@(loop for pair in members
 					    append pair)))))
 
+(defmacro def-router (name (&rest members) 
+                      &key (base '(chain *backbone *router)))
+  `(setf (gethash ',name *global*)
+	 (make-instance 'bone
+			:name ',name
+			:base ',base
+			:members (list ,@(loop for pair in members
+					    append pair)))))
+
+
 
 (defmacro def-collection (name (&rest members) 
 			  &key (base '(chain 

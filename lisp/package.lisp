@@ -15,6 +15,7 @@
 	   #:bone-members
 	   #:def-view
 	   #:def-model
+	   #:def-router
 	   #:def-collection
 	   #:def-collection-view
            #:access-bone
