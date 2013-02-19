@@ -25,7 +25,7 @@
 		    (delete (getprop (@ this view-list) cid)))
 		   nil))
      ('add-sub-view '(lambda (view)
-		      (setf (getprop (@ this view-list) cid) view))))
+		      (setf (getprop (@ this view-list) (@ view cid)) view))))
   :base (chain *backbone *view))
 
 (def-view *lazy-collection-view
