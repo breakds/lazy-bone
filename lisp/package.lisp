@@ -5,10 +5,12 @@
   (:nicknames #:lazy-bone)
   (:use #:cl
 	#:hunchentoot
-        #:breakds.basicl.exmac)
+        #:alexandria)
   (:import-from #:parenscript #:ps* #:ps #:create
                 #:chain #:defpsmacro #:new #:getprop #:@ #:for-in)
   (:export #:*global*
+           #:read-tmpl
+           #:set-template-registry
            #:bone
 	   #:bone-name
 	   #:bone-base

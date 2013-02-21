@@ -39,8 +39,9 @@
 		     "remove" (@ this lazy-remove))
 		    ((@ this model each) (@ this lazy-add))))
      ('lazy-add '(lambda (model)
-		  (defvar view (new ((@ this sub-view) 
-				     (create model model))))
+                  ;; debugging
+                  (defvar view (new ((@ this sub-view) 
+                                     (create model model))))
 		  (setf (getprop (@ this view-list) (@ model cid)) view)
 		  ((@ this register) model)
 		  view))
