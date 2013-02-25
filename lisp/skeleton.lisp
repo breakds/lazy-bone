@@ -8,6 +8,19 @@
 
 (in-package #:breakds.lazy-bone)
 
+;;; base class for collection
+(def-model *lazy-collection
+    (('initialize '(lazy-init-base
+                    (if (@ args model-list)
+                        (setf (@ this list) 
+                              (new ((@ *backbone *collection) 
+                                    (@ args model-list)
+                                    (create model (@ this model)))))
+                        (setf (@ this list)
+                              (new ((@ *backbone *collection) 
+                                    (@ args model-list)
+                                    (create model (@ this model))))))))))
+
 ;;; base class for view
 (def-view *lazy-view
     (('initialize '(lazy-init-base
@@ -36,19 +49,20 @@
 		    ((@ this listen-to) (@ this model) 
 		     "add" (@ this lazy-add))
 		    ((@ this listen-to) (@ this model) 
-		     "remove" (@ this lazy-remove))
-		    ((@ this model each) (@ this lazy-add))))
+		     "remove" (@ this lazy-remove))))
      ('lazy-add '(lambda (model)
-                  (defvar view (new ((@ this sub-view) 
-                                     (create model model))))
+                  (defvar view nil)
+                  (let ((parent-node (if (@ this entry-point)
+                                         ((@ this $) (@ this entry-point))
+                                         (@ this $el))))
+                      (setf view (new ((@ this sub-view) 
+                                       (create model model 
+                                               parent-node parent-node)))))
 		  (setf (getprop (@ this view-list) (@ model cid)) view)
 		  ((@ this register) model)
 		  view))
      ('lazy-remove '(lambda (model) 
 		     ((@ (getprop (@ this view-list) (@ model cid)) terminate))
-		     (delete (getprop (@ this view-list) (@ model cid)))))
-     ('register '(lambda (model)
-		  ((@ this $el append)
-		   (@ ((@ (getprop (@ this view-list) (@ model cid)) render)) el)))))
+		     (delete (getprop (@ this view-list) (@ model cid))))))
   :base *lazy-view)
 

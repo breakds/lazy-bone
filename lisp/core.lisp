@@ -54,8 +54,7 @@
 
 
 (defmacro def-collection (name (&rest members) 
-			  &key (base '(chain 
-				       *backbone *collection)))
+			  &key (base '*lazy-collection))
   `(setf (gethash ',name *global*)
 	 (make-instance 'bone
 			:name ',name
