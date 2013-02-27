@@ -46,10 +46,13 @@
 		    (setf sub-view (create))
 		    ((@ _ bind-all) this "lazyAdd")
 		    ((@ _ bind-all) this "lazyRemove")
-		    ((@ this listen-to) (@ this model list) 
-		     "add" (@ this lazy-add))
-		    ((@ this listen-to) (@ this model list) 
-		     "remove" (@ this lazy-remove))))
+                    (let ((lst (if (@ this model list)
+                                   (@ this model list)
+                                   (@ this model))))
+                      ((@ this listen-to) lst
+                       "add" (@ this lazy-add))
+                      ((@ this listen-to) lst
+                       "remove" (@ this lazy-remove)))))
      ('lazy-add '(lambda (model)
                   (defvar view nil)
                   (let ((parent-node (if (@ this entry-point)
