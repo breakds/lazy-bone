@@ -10,6 +10,7 @@
                 #:chain #:defpsmacro #:new #:getprop #:@ #:for-in)
   (:export #:*global*
            #:read-tmpl
+           #:clear-tmpl
            #:set-template-registry
            #:bone
 	   #:bone-name

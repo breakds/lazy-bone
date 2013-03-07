@@ -21,6 +21,10 @@
           value
           (setf (gethash true-path *template-store*)
                 (read-file-into-string true-path))))))
+
+(defun clear-tmpl ()
+  "clear the template store."
+  (setf *template-store* (make-hash-table :test #'equal)))
                      
   
 
