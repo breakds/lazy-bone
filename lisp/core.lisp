@@ -134,6 +134,34 @@
 (defpsmacro trace (expression)
   `((@ console log) ,expression))
 
+(defpsmacro construct-chain (accu &rest forms)
+  (if (null forms)
+      accu
+      (let ((x (car forms)))
+        (cond ((null accu) `(construct-chain ,x ,@(cdr forms)))
+              ((consp x) `(construct-chain ,(cons (list '@ accu (car x)) 
+                                                  (cdr x))
+                                           ,@(cdr forms)))
+              (t `(construct-chain ,(list '@ accu x) 
+                                   ,@(cdr forms)))))))
+
+(defpsmacro chaining (&rest forms)
+  `(construct-chain nil ,@forms))
+
+
+;;; ---------- model related shortcuts ----------
+(defpsmacro render-from-model ()
+  `((@ this $el html)
+    (((@ _ template)
+      (@ this template))
+     ((@ this model to-j-s-o-n)))))
+
+(defpsmacro mdl-get (str &optional (model '(@ this model)))
+  `((@ ,model get) ,str))
+
+
+
+
 
 ;;; ========== temperary parenscript macros ==========
 (defpsmacro acquire-args ((&rest names) (&rest arg-names))
@@ -199,30 +227,3 @@
     (hunchentoot:stop *acceptor*)
     (format t "server stopped.~%")))
 
-
-                                     
-
-
-  
-        
-          
-        
-        
-     
-        
-
-
-
-
-
-
-
-
-
-
-
-
-		       
-  
-
-  

@@ -29,7 +29,11 @@
 	   #:lazy-init-base
            #:wait-until
 	   #:trace
+           #:chaining
 	   #:acquire-args
+           #:construct-chain
+           #:render-from-model
+           #:mdl-get
 	   #:*lazy-view
 	   #:*lazy-collection-view
            #:gen-topological
