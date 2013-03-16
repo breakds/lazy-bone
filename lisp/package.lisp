@@ -25,15 +25,6 @@
            #:clear-global
 	   #:place-view
 	   #:bone-definition
-	   #:lazy-init
-	   #:lazy-init-base
-           #:wait-until
-	   #:trace
-           #:chaining
-	   #:acquire-args
-           #:construct-chain
-           #:render-from-model
-           #:mdl-get
 	   #:*lazy-view
 	   #:*lazy-collection-view
            #:gen-topological
@@ -41,6 +32,16 @@
            #:define-simple-app
            #:start-server
            #:stop-server
+           ;; parenscript macros
+	   #:lazy-init
+	   #:lazy-init-base
+           #:wait-until
+	   #:trace
+           #:@.
+	   #:acquire-args
+           #:construct-chain
+           #:render-from-model
+           #:@get
            ;; for debugging
            #:*acceptor*))
            
