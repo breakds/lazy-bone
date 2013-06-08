@@ -19,7 +19,9 @@
                         (setf (@ this list)
                               (new ((@ *backbone *collection) 
                                     (array)
-                                    (create model (@ this model))))))))))
+                                    (if (@ args url)
+                                        (create model (@ this model) url (@ args url))
+                                        (create model (@ this model)))))))))))
 
 ;;; base class for view
 (def-view *lazy-view
