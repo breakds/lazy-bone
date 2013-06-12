@@ -21,7 +21,8 @@
                                     (array)
                                     (if (@ args url)
                                         (create model (@ this model) url (@ args url))
-                                        (create model (@ this model)))))))))))
+                                        (create model (@ this model)))))))
+                    (setf (@ this list parent-model) this)))))
 
 ;;; base class for view
 (def-view *lazy-view
