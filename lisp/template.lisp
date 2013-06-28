@@ -22,6 +22,17 @@
           (setf (gethash true-path *template-store*)
                 (read-file-into-string true-path))))))
 
+(defpsmacro tmpl-from (tmpl-file)
+  "read template from the template file"
+  (let ((true-path (truename (merge-pathnames tmpl-file *template-registry*))))
+    (multiple-value-bind (value exist)
+        (gethash true-path *template-store*)
+      (if exist
+          value
+          (setf (gethash true-path *template-store*)
+                (read-file-into-string true-path))))))
+
+
 (defun clear-tmpl ()
   "clear the template store."
   (setf *template-store* (make-hash-table :test #'equal)))

@@ -56,8 +56,10 @@
        (funcall (chain ,(bone-base obj) extend)
 		(create ,@(bone-members obj))))))
 
-(defpsmacro place-view (name)
-  `(setf ,name (lambda () nil)))
+(defpsmacro duplicate (name &rest para-list)
+  "instantiate a new model/collection/view"
+  `(new (,name (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
+                                 (exlist:group para-list 2))))))
 
 
 (defpsmacro trace (&rest expressions)
@@ -100,3 +102,13 @@
   `(setf ,@(mapcan (lambda (x y) (list (list 'chain 'this x) 
 				       (list 'chain 'args y)))
 		   names arg-names)))
+
+(defpsmacro eval-lisp (&body body)
+  "eval lisp code which generates parenscript code"
+  (eval `(progn ,@body)))
+
+(defpsmacro create-event-manager (obj)
+  `(setf ,obj ((@ _ extend) (create) (@ *backbone *events))))
+             
+
+  

@@ -24,53 +24,23 @@
 
 ;;; ========== Definition Macros ==========
 
-(defmacro def-view (name (&rest members) 
-		    &key (base '*lazy-view))
-  `(setf (gethash ',name *global*)
-         (make-instance 'bone
-                        :name ',name
-                        :base ',base
-                        :members (list ,@(loop for pair in members
-					    append pair)))))
 
-(defmacro def-model (name (&rest members) 
-		     &key (base '(chain *backbone *model)))
-  `(setf (gethash ',name *global*)
-	 (make-instance 'bone
-			:name ',name
-			:base ',base
-			:members (list ,@(loop for pair in members
-					    append pair)))))
+(defmacro def-class-create (def-name base)
+  `(defmacro ,(exmac:symb 'def- def-name) 
+       (name (&rest members)
+        &key (base ',base))
+     `(setf (gethash ',name *global*)
+            (make-instance 'bone
+                           :name ',name
+                           :base ',base
+                           :members (list ,@(mapcan #`(',(car x1) ',(cadr x1))
+                                                    members))))))
 
-(defmacro def-router (name (&rest members) 
-                      &key (base '(chain *backbone *router)))
-  `(setf (gethash ',name *global*)
-	 (make-instance 'bone
-			:name ',name
-			:base ',base
-			:members (list ,@(loop for pair in members
-					    append pair)))))
-
-
-
-(defmacro def-collection (name (&rest members) 
-			  &key (base '*lazy-collection))
-  `(setf (gethash ',name *global*)
-	 (make-instance 'bone
-			:name ',name
-			:base ',base
-			:members (list ,@(loop for pair in members
-					    append pair)))))
-
-
-(defmacro def-collection-view (name (&rest members) 
-			       &key (base '*lazy-collection-view))
-  `(setf (gethash ',name *global*)
-	 (make-instance 'bone
-			:name ',name
-			:base ',base
-			:members (list ,@(loop for pair in members
-					    append pair)))))
+(def-class-create view *lazy-view)
+(def-class-create model (chain *backbone *model))
+(def-class-create router (chain *backbone *router))
+(def-class-create collection *lazy-collection)
+(def-class-create collection-view *lazy-collection-view)
 
 
 (defmacro access-bone (name)
@@ -89,7 +59,7 @@
                          (cons 'progn
                                (loop for ,name in (gen-topological)
                                   collect (list 'bone-definition ,name)))
-                         ,@body
+                         ,@(mapcar #`',x1 body)
                          nil)))))
 
 ;; ========== Hunchentoot ==========

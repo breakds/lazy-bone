@@ -7,6 +7,7 @@
 	#:hunchentoot
         #:alexandria)
   (:import-from #:parenscript #:ps* #:ps #:create
+                #:import-macros-from-lisp
                 #:chain #:defpsmacro #:new #:getprop #:@ #:for-in)
   (:export #:*global*
            #:read-tmpl
@@ -17,6 +18,7 @@
 	   #:bone-base
 	   #:bone-members
 	   #:def-view
+           #:def-view%
 	   #:def-model
 	   #:def-router
 	   #:def-collection
@@ -42,6 +44,10 @@
            #:construct-chain
            #:render-from-model
            #:@get
+           #:duplicate
+           #:tmpl-from
+           #:eval-lisp
+           #:create-event-manager
            ;; for debugging
            #:*acceptor*))
            
