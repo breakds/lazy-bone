@@ -25,7 +25,7 @@ for both client-side and server-side. The features are
 
 ## Example
 
-An example is built on top of this library can be found [here](https://github.com/breakds/lazy-bone-example)
+An example built on top of this library can be found [here](https://github.com/breakds/lazy-bone-example)
 
 
 ## Lisence
