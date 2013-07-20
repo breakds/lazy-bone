@@ -27,6 +27,8 @@ for both client-side and server-side. The features are
 
 An example built on top of this library can be found [here](https://github.com/breakds/lazy-bone-example)
 
+And a more sophisticated example [Hunter-Kit] (https://github.com/breakds/HunterKit)
+
 
 ## Lisence
 
