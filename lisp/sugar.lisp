@@ -92,6 +92,10 @@
       (@ this template))
      ((@ this model to-j-s-o-n)))))
 
+(defpsmacro append-to-parent ()
+  `(@. ($ (@ this parent-node)) 
+       (append (@. this (render) el))))
+
 (defpsmacro @get (str &optional (model '(@ this model)))
   "get the property of a model"
   `((@ ,model get) ,str))
@@ -111,4 +115,8 @@
   `(setf ,obj ((@ _ extend) (create) (@ *backbone *events))))
              
 
-  
+(defpsmacro properties (&rest para-list)
+  "defaults list for def-models"
+  `(lambda () 
+     (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
+                       (exlist:group para-list 2)))))

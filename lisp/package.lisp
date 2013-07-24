@@ -43,8 +43,10 @@
 	   #:acquire-args
            #:construct-chain
            #:render-from-model
+           #:append-to-parent
            #:@get
            #:duplicate
+           #:properties
            #:tmpl-from
            #:eval-lisp
            #:create-event-manager
