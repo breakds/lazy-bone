@@ -1,4 +1,3 @@
-;;;; sugar.lisp
 ;;;; Description: sugar for writing lazy-bone parenscript code for Backbone.js
 
 
@@ -100,6 +99,11 @@
   "get the property of a model"
   `((@ ,model get) ,str))
 
+(defpsmacro @set (str val &optional (model '(@ this model)))
+  "get the property of a model"
+  `((@ ,model set) ,str ,val))
+
+
 
 (defpsmacro acquire-args ((&rest names) (&rest arg-names))
   "acquire the args to member variables"
@@ -111,12 +115,53 @@
   "eval lisp code which generates parenscript code"
   (eval `(progn ,@body)))
 
-(defpsmacro create-event-manager (obj)
-  `(setf ,obj ((@ _ extend) (create) (@ *backbone *events))))
-             
+(defpsmacro create-event-manager (obj &rest events-handlers)
+  `(progn (setf ,obj ((@ _ extend) (create) (@ *backbone *events)))
+          ,@(mapcar #`((@ ,obj on) ,(car x1) ,(cadr x1) this)
+                    (exlist:group events-handlers 2))))
 
+(defpsmacro stringified-obj (&rest para-list)
+  `(@. *json* (stringify 
+               (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
+                                 (exlist:group para-list 2))))))
+                       
+                                     
 (defpsmacro properties (&rest para-list)
   "defaults list for def-models"
   `(lambda () 
      (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
                        (exlist:group para-list 2)))))
+
+
+(defmacro var-to-string (x)
+  (with-gensyms (pre)
+    `(let ((,pre (ps:ps ,x)))
+       (subseq ,pre 0 (1- (length ,pre))))))
+
+
+
+(defpsmacro @fetch (obj &rest para-list)
+  (with-gensyms (json-obj session)
+    (let ((url (getf para-list :url))
+          (server-header (cadr (getf para-list :server)))
+          (server-body (cddr (getf para-list :server)))
+          (plist (copy-list para-list)))
+      (remf plist :url)
+      (remf plist :server)
+      `(progn
+         (setf (@ ,obj url) ,url)
+         (@. ,obj (fetch (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
+                                           (exlist:group plist 2))
+                                 data (@. *json* (stringify (create ,@(mapcan #`,x1 server-header)))))))
+         (eval-lisp (define-easy-handler (,(exmac:symb url '-handler) :uri ,url) ()
+                      (setf (content-type*) "application/json")
+                      (let ((,json-obj (jsown:parse (raw-post-data :force-text t)))
+                            (,session (start-session)))
+                        (declare (ignorable ,session))
+                        (let (,@(mapcar #`(,(car x1) (jsown:val ,json-obj (var-to-string ,(car x1))))
+                                        server-header))
+                          ,@server-body)))
+                    nil)))))
+                      
+         
+     

@@ -7,6 +7,7 @@
                #:hunchentoot
                #:html-template
                #:parenscript
+               #:jsown
                #:alexandria)
   :components ((:file "lisp/package")
                (:file "lisp/template")

@@ -45,11 +45,14 @@
            #:render-from-model
            #:append-to-parent
            #:@get
+           #:@set
            #:duplicate
            #:properties
            #:tmpl-from
            #:eval-lisp
            #:create-event-manager
+           #:stringified-obj
+           #:@fetch
            ;; for debugging
            #:*acceptor*))
            
