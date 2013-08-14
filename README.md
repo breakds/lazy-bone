@@ -22,6 +22,9 @@ for both client-side and server-side. The features are
 + breakds@gmail.com
 + https://github.com/breakds
 
+## Tutorial
+
+This [Tutorial](http://breakds.github.io/game24/) demostrate how to write a server/client web application that plays the 24 Game.
 
 ## Example
 
