@@ -26,7 +26,7 @@
 
 
 (defmacro def-class-create (def-name base)
-  `(defmacro ,(exmac:symb 'def- def-name) 
+  `(defmacro ,(swiss-knife:symb 'def- def-name) 
        (name (&rest members)
         &key (base ',base))
      `(setf (gethash ',name *global*)

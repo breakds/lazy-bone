@@ -57,8 +57,8 @@
 
 (defpsmacro duplicate (name &rest para-list)
   "instantiate a new model/collection/view"
-  `(new (,name (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
-                                 (exlist:group para-list 2))))))
+  `(new (,name (create ,@(mapcan #`(,(swiss-knife:symb (car x1)) ,(cadr x1))
+                                 (swiss-knife:group para-list 2))))))
 
 
 (defpsmacro trace (&rest expressions)
@@ -118,19 +118,19 @@
 (defpsmacro create-event-manager (obj &rest events-handlers)
   `(progn (setf ,obj ((@ _ extend) (create) (@ *backbone *events)))
           ,@(mapcar #`((@ ,obj on) ,(car x1) ,(cadr x1) this)
-                    (exlist:group events-handlers 2))))
+                    (swiss-knife:group events-handlers 2))))
 
 (defpsmacro stringified-obj (&rest para-list)
   `(@. *json* (stringify 
-               (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
-                                 (exlist:group para-list 2))))))
+               (create ,@(mapcan #`(,(swiss-knife:symb (car x1)) ,(cadr x1))
+                                 (swiss-knife:group para-list 2))))))
                        
                                      
 (defpsmacro properties (&rest para-list)
   "defaults list for def-models"
   `(lambda () 
-     (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
-                       (exlist:group para-list 2)))))
+     (create ,@(mapcan #`(,(swiss-knife:symb (car x1)) ,(cadr x1))
+                       (swiss-knife:group para-list 2)))))
 
 
 (defmacro var-to-string (x)
@@ -150,10 +150,10 @@
       (remf plist :server)
       `(progn
          (setf (@ ,obj url) ,url)
-         (@. ,obj (fetch (create ,@(mapcan #`(,(exmac:symb (car x1)) ,(cadr x1))
-                                           (exlist:group plist 2))
+         (@. ,obj (fetch (create ,@(mapcan #`(,(swiss-knife:symb (car x1)) ,(cadr x1))
+                                           (swiss-knife:group plist 2))
                                  data (@. *json* (stringify (create ,@(mapcan #`,x1 server-header)))))))
-         (eval-lisp (define-easy-handler (,(exmac:symb url '-handler) :uri ,url) ()
+         (eval-lisp (define-easy-handler (,(swiss-knife:symb url '-handler) :uri ,url) ()
                       (setf (content-type*) "application/json")
                       (let ((,json-obj (jsown:parse (raw-post-data :force-text t)))
                             (,session (start-session)))
